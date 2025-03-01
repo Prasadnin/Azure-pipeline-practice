@@ -9,33 +9,52 @@ trigger:
 pool:
   vmImage: ubuntu-latest
 
+steps:
+- script: echo Hello, world updated!
+  displayName: 'Run a one-line script'
+
+- script: |
+    echo Add other tasks to build, test, and deploy your project.
+    echo See https://aka.ms/yaml
+  displayName: 'Run a multi-line script'
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
 jobs:
--job: JOB1
-  steps:
-  - script: echo JOB1 !
-    displayName: 'Run a one-line script'
-  
-  - script: |
-      echo Add other tasks to build, test, and deploy your project.
-      echo See https://aka.ms/yaml
-    displayName: 'Run a multi-line script'
+ -job: JOB1
+      steps:
+      - script: echo JOB1 !
+        displayName: 'Run a one-line script'
+      
+      - script: |
+          echo Add other tasks to build, test, and deploy your project.
+          echo See https://aka.ms/yaml
+        displayName: 'Run a multi-line script'
 
--job: Job2
+ -job: Job2
   dependsOn: Job1
-  steps:
-  - script: echo JOB2 !
-    displayName: 'Run a one-line script'
+      steps:
+      - script: echo JOB2 !
+        displayName: 'Run a one-line script'
 
--job: Job3
+ -job: Job3
   dependsOn: Job2
-  steps:
-  - script: echo JOB3 !
-    displayName: 'Run a one-line script'
+      steps:
+      - script: echo JOB3 !
+        displayName: 'Run a one-line script'
 
--job: Job4
+ -job: Job4
   dependsOn: 
   - Job2
   - Job3
-  steps:
-  - script: echo JOB4 !
-    displayName: 'Run a one-line script'
+      steps:
+      - script: echo JOB4 !
+        displayName: 'Run a one-line script'
