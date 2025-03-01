@@ -1,0 +1,77 @@
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+  - stage: Build
+    jobs:
+      - job: JOB1
+        steps:
+          - script: echo Syncing the code!
+
+      - job: JOB2
+        dependsOn: JOB1
+        steps:
+          - bash: echo $(Agent.BuildDirectory) is the BuildDirectory
+          - bash: echo $(Agent.HomeDirectory) is the HomeDirectory
+          - bash: echo $(Agent.Id) is the AgentId
+          - bash: echo $(Agent.JobName) is the JobName
+          - bash: echo $(AGENT_JOBSTATUS) is the JOBSTATUS
+          - bash: echo $(Agent.MachineName) is the MachineName
+          - bash: echo $(Build.ArtifactStagingDirectory) is the ArtifactStagingDirectory
+          - bash: echo $(Build.BuildId) is the BuildId
+          - bash: echo $(Build.BuildNumber) is the BuildNumber
+          - bash: echo $(Build.BinariesDirectory) is the BinariesDirectory
+          - bash: echo $(Build.QueuedBy) is QueuedBy
+          - bash: echo $(Build.Repository.Name) is the Repository Name
+          - bash: echo $(Build.StagingDirectory) is the StagingDirectory
+          - task: CopyFiles@2
+            inputs:
+              SourceFolder: '$(System.DefaultWorkingDirectory)'
+              Contents: |
+                **/*.yml
+                **/*.tf
+              TargetFolder: '$(Build.ArtifactStagingDirectory)'
+          - task: PublishBuildArtifacts@1
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+              ArtifactName: 'drop'
+              publishLocation: 'Container'
+
+  - stage: Test
+    dependsOn: Build
+    jobs:
+      - job: JOB1
+        steps:
+          - script: echo Testing the code!
+
+  - stage: DevDeploy
+    variables:
+      environment: Dev
+    dependsOn: Test
+    jobs:
+      - job: JOB1
+        steps:
+          - bash: echo $(environment) DeployJob
+
+  - stage: QADeploy
+    variables:
+      environment: QA
+    dependsOn: Test
+    jobs:
+      - job: JOB1
+        steps:
+          - bash: echo $(environment) DeployJob
+
+  - stage: ProdDeploy
+    variables:
+      environment: Prod  # Changed from QA to Prod
+    dependsOn: 
+      - DevDeploy
+      - QADeploy
+    jobs:
+      - job: JOB1
+        steps:
+          - bash: echo $(environment) DeployJob
