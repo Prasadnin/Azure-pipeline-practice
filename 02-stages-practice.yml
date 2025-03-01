@@ -38,7 +38,9 @@ stages:
           - script: echo QADeploy the code!
 
   - stage: ProdDeploy
-    dependsOn: Test
+    dependsOn: 
+     - DevDeploy
+     - QADeploy
     jobs:
       - job: JOB1
         steps:
