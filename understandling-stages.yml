@@ -1,0 +1,53 @@
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+  - stage: Build
+    jobs:
+      - job: JOB1
+        steps:
+          - script: echo Syncing the code!
+
+      - job: JOB2
+        dependsOn: JOB1
+        steps:
+          - script: echo Compiling the code!
+
+  - stage: Test
+    dependsOn: Build
+    jobs:
+      - job: JOB1
+        steps:
+          - script: echo Testing the code!
+
+  - stage: DevDeploy
+    variables:
+      environment: Dev
+    dependsOn: Test
+    jobs:
+      - job: JOB1
+        steps:
+          - bash: echo $(environment)DeployJob
+
+  - stage: QADeploy
+    variables:
+      environment: QA
+    dependsOn: Test
+    jobs:
+      - job: JOB1
+        steps:
+          - bash: echo $(environment)DeployJob
+
+  - stage: ProdDeploy
+    variables:
+      environment: QA
+    dependsOn: 
+     - DevDeploy
+     - QADeploy
+    jobs:
+      - job: JOB1
+        steps:
+          - bash: echo $(environment)DeployJob
